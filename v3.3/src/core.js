@@ -810,6 +810,8 @@ cc._initSys = function (config, CONFIG_KEY) {
             browserType = sys.BROWSER_TYPE_ANDROID;
         else if (browserType == "trident") browserType = sys.BROWSER_TYPE_IE;
         else if (browserType == "360 aphone") browserType = sys.BROWSER_TYPE_360;
+    }else if(ua.indexOf("iphone") && ua.indexOf("mobile")){
+        browserType = "safari";
     }
     sys.browserType = browserType;
     var iOS = ( ua.match(/(iPad|iPhone|iPod)/i) ? true : false );
@@ -10070,6 +10072,15 @@ cc.spriteFrameCache = {
             this._frameConfigCache[url] = dict;
             return dict;
         }
+        this._frameConfigCache[url] = this._parseFrameConfig(dict);
+        return this._frameConfigCache[url];
+    },
+    _getFrameConfigByJsonObject: function(url, jsonObject) {
+        cc.assert(jsonObject, cc._LogInfos.spriteFrameCache__getFrameConfig_2, url);
+        this._frameConfigCache[url] = this._parseFrameConfig(jsonObject);
+        return this._frameConfigCache[url];
+    },
+    _parseFrameConfig: function(dict) {
         var tempFrames = dict["frames"], tempMeta = dict["metadata"] || dict["meta"];
         var frames = {}, meta = {};
         var format = 0;
@@ -10120,20 +10131,16 @@ cc.spriteFrameCache = {
             }
             frames[key] = tempFrame;
         }
-        var cfg = this._frameConfigCache[url] = {
-            _inited : true,
-            frames : frames,
-            meta : meta
-        };
-        return cfg;
+        return {_inited: true, frames: frames, meta: meta};
     },
-    addSpriteFrames: function (url, texture) {
+    _addSpriteFramesByObject: function(url, jsonObject, texture) {
         cc.assert(url, cc._LogInfos.spriteFrameCache_addSpriteFrames_2);
-        var dict = this._frameConfigCache[url] || cc.loader.getRes(url);
-        if(!dict || !dict["frames"])
+        if(!jsonObject || !jsonObject["frames"])
             return;
-        var self = this;
-        var frameConfig = self._frameConfigCache[url] || self._getFrameConfig(url);
+        var frameConfig = this._frameConfigCache[url] || this._getFrameConfigByJsonObject(url, jsonObject);
+        this._createSpriteFrames(frameConfig, texture);
+    },
+    _createSpriteFrames: function(frameConfig, texture) {
         var frames = frameConfig.frames, meta = frameConfig.meta;
         if(!texture){
             var texturePath = cc.path.changeBasename(url, meta.image || ".png");
@@ -10144,7 +10151,7 @@ cc.spriteFrameCache = {
         }else{
             cc.assert(0, cc._LogInfos.spriteFrameCache_addSpriteFrames_3);
         }
-        var spAliases = self._spriteFramesAliases, spriteFrames = self._spriteFrames;
+        var spAliases = this._spriteFramesAliases, spriteFrames = this._spriteFrames;
         for (var key in frames) {
             var frame = frames[key];
             var spriteFrame = spriteFrames[key];
@@ -10154,9 +10161,8 @@ cc.spriteFrameCache = {
                 if(aliases){//set aliases
                     for(var i = 0, li = aliases.length; i < li; i++){
                         var alias = aliases[i];
-                        if (spAliases[alias]) {
+                        if (spAliases[alias])
                             cc.log(cc._LogInfos.spriteFrameCache_addSpriteFrames, alias);
-                        }
                         spAliases[alias] = key;
                     }
                 }
@@ -10176,6 +10182,14 @@ cc.spriteFrameCache = {
                 spriteFrames[key] = spriteFrame;
             }
         }
+    },
+    addSpriteFrames: function (url, texture) {
+        cc.assert(url, cc._LogInfos.spriteFrameCache_addSpriteFrames_2);
+        var dict = this._frameConfigCache[url] || cc.loader.getRes(url);
+        if(!dict || !dict["frames"])
+            return;
+        var frameConfig = this._frameConfigCache[url] || this._getFrameConfig(url);
+        this._createSpriteFrames(frameConfig, texture);
     },
     _checkConflict: function (dictionary) {
         var framesDict = dictionary["frames"];
@@ -10240,11 +10254,11 @@ cc.spriteFrameCache = {
         }
         return frame;
     },
-	_clear: function () {
-		this._spriteFrames = {};
-		this._spriteFramesAliases = {};
-		this._frameConfigCache = {};
-	}
+    _clear: function () {
+        this._spriteFrames = {};
+        this._spriteFramesAliases = {};
+        this._frameConfigCache = {};
+    }
 };
 cc.g_NumberOfDraws = 0;
 cc.GLToClipTransform = function (transformOut) {
