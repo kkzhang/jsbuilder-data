@@ -951,9 +951,9 @@ function _determineRenderType(config) {
         config[CONFIG_KEY.renderMode] = 0;
     cc._renderType = cc.game.RENDER_TYPE_CANVAS;
     cc._supportRender = true;
-    if ( userRenderMode === 2 || 
-        (   userRenderMode === 0 && 
-            shieldOs.indexOf(cc.sys.os) === -1 && 
+    if ( userRenderMode === 2 ||
+        (   userRenderMode === 0 &&
+            shieldOs.indexOf(cc.sys.os) === -1 &&
             shieldBrowser.indexOf(cc.sys.browserType) === -1 )) {
         if (cc.sys.capabilities["opengl"]) {
             cc._renderType = cc.game.RENDER_TYPE_WEBGL;
@@ -1129,7 +1129,7 @@ cc.game = {
     },
     prepare: function (cb) {
         var self = this,
-            config = self.config, 
+            config = self.config,
             CONFIG_KEY = self.CONFIG_KEY;
         this._loadConfig();
         if (this._prepared) {
@@ -1173,7 +1173,12 @@ cc.game = {
         }
         else {
             if (config) {
-                cc.game.config = config;
+                if (typeof config === 'string') {
+                    if (!cc.game.config) cc.game.config = {};
+                    cc.game.config[cc.game.CONFIG_KEY.id] = config;
+                } else {
+                    cc.game.config = config;
+                }
             }
             if (typeof onStart === 'function') {
                 cc.game.onStart = onStart;
@@ -3429,7 +3434,7 @@ cc.EGLView = cc.Class.extend({
         return cc.p(this._visibleRect.x,this._visibleRect.y);
     },
     getVisibleOriginInPixel: function () {
-        return cc.p(this._visibleRect.x * this._scaleX, 
+        return cc.p(this._visibleRect.x * this._scaleX,
                     this._visibleRect.y * this._scaleY);
     },
     canSetContentScaleFactor: function () {
@@ -7566,9 +7571,9 @@ cc._tmp.WebGLTexture2D = function () {
                 self.maxS, self.maxT,
                 0.0, 0.0,
                 self.maxS, 0.0];
-            var vertices = [    rect.x, rect.y, 
-                rect.x + rect.width, rect.y, 
-                rect.x, rect.y + rect.height, 
+            var vertices = [    rect.x, rect.y,
+                rect.x + rect.width, rect.y,
+                rect.x, rect.y + rect.height,
                 rect.x + rect.width, rect.y + rect.height         ];
             cc.glEnableVertexAttribs(cc.VERTEX_ATTRIB_FLAG_POSITION | cc.VERTEX_ATTRIB_FLAG_TEX_COORDS);
             self._shaderProgram.use();
@@ -12488,7 +12493,7 @@ cc.LabelTTF._firsrEnglish = /^[a-zA-Z0-9ÄÖÜäöüßéèçàùêâîôû]/;
             OffsetYArray.push(yOffset);
         }
         var tmpStatus = {
-            contextTransform:cc.v2f(dx,dy),
+            contextTransform:cc.p(dx,dy),
             xOffset:xOffset,
             OffsetYArray:OffsetYArray
         };
@@ -13007,7 +13012,7 @@ cc.rendererCanvas = {
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, viewport.width, viewport.height);
         if (this._clearColor.r !== 0 ||
-            this._clearColor.g !== 0 || 
+            this._clearColor.g !== 0 ||
             this._clearColor.b !== 0) {
             wrapper.setFillStyle(this._clearFillStyle);
             wrapper.setGlobalAlpha(this._clearColor.a);
