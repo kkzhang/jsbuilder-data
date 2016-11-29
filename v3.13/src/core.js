@@ -865,7 +865,7 @@ var _initSys = function () {
     sys.osMainVersion = osMainVersion;
     sys.browserType = sys.BROWSER_TYPE_UNKNOWN;
     (function(){
-        var typeReg1 = /micromessenger|mqqbrowser|sogou|qzone|liebao|ucbrowser|360 aphone|360browser|baiduboxapp|baidubrowser|maxthon|mxbrowser|trident|miuibrowser/i;
+        var typeReg1 = /mqqbrowser|sogou|qzone|liebao|micromessenger|ucbrowser|360 aphone|360browser|baiduboxapp|baidubrowser|maxthon|mxbrowser|trident|miuibrowser/i;
         var typeReg2 = /qqbrowser|chrome|safari|firefox|opr|oupeng|opera/i;
         var browserTypes = typeReg1.exec(ua);
         if(!browserTypes) browserTypes = typeReg2.exec(ua);
@@ -949,13 +949,8 @@ var _initSys = function () {
         var tmpCanvas = document.createElement("CANVAS");
         try{
             var context = cc.create3DContext(tmpCanvas, {'stencil': true});
-            if (context && context.getShaderPrecisionFormat) {
+            if(context) {
                 _supportWebGL = true;
-            }
-            if (_supportWebGL && sys.os === sys.OS_IOS) {
-                if (!window.indexedDB) {
-                    _supportWebGL = false;
-                }
             }
             if (_supportWebGL && sys.os === sys.OS_ANDROID) {
                 var browserVer = parseFloat(sys.browserVersion);
@@ -3385,7 +3380,6 @@ cc.EGLView = cc.Class.extend({
     _devicePixelRatio: 1,
     _viewName: "",
     _resizeCallback: null,
-    _orientationChanging: true,
     _scaleX: 1,
     _originalScaleX: 1,
     _scaleY: 1,
@@ -3449,10 +3443,6 @@ cc.EGLView = cc.Class.extend({
             view.setDesignResolutionSize(width, height, view._resolutionPolicy);
         }
     },
-    _orientationChange: function () {
-        cc.view._orientationChanging = true;
-        cc.view._resizeEvent();
-    },
     setTargetDensityDPI: function(densityDPI){
         this._targetDensityDPI = densityDPI;
         this._adjustViewportMeta();
@@ -3465,13 +3455,13 @@ cc.EGLView = cc.Class.extend({
             if (!this.__resizeWithBrowserSize) {
                 this.__resizeWithBrowserSize = true;
                 window.addEventListener('resize', this._resizeEvent);
-                window.addEventListener('orientationchange', this._orientationChange);
+                window.addEventListener('orientationchange', this._resizeEvent);
             }
         } else {
             if (this.__resizeWithBrowserSize) {
                 this.__resizeWithBrowserSize = false;
                 window.removeEventListener('resize', this._resizeEvent);
-                window.removeEventListener('orientationchange', this._orientationChange);
+                window.removeEventListener('orientationchange', this._resizeEvent);
             }
         }
     },
@@ -3491,7 +3481,7 @@ cc.EGLView = cc.Class.extend({
         var w = __BrowserGetter.availWidth(this._frame);
         var h = __BrowserGetter.availHeight(this._frame);
         var isLandscape = w >= h;
-        if (!this._orientationChanging || !cc.sys.isMobile ||
+        if (!cc.sys.isMobile ||
             (isLandscape && this._orientation & cc.ORIENTATION_LANDSCAPE) ||
             (!isLandscape && this._orientation & cc.ORIENTATION_PORTRAIT)) {
             locFrameSize.width = w;
@@ -3509,9 +3499,6 @@ cc.EGLView = cc.Class.extend({
             cc.container.style.transformOrigin = '0px 0px 0px';
             this._isRotated = true;
         }
-        setTimeout(function () {
-            cc.view._orientationChanging = false;
-        }, 1000);
     },
     _adjustSizeKeepCanvasSize: function () {
         var designWidth = this._originalDesignResolutionSize.width;

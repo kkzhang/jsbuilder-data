@@ -4798,7 +4798,6 @@ ccui.Button = ccui.Widget.extend({
         this._buttonDisableRenderer = new cc.Sprite();
         this._titleRenderer = new cc.LabelTTF("");
         this._titleRenderer.setAnchorPoint(0.5, 0.5);
-        this._titleRenderer.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
         this.addProtectedChild(this._buttonNormalRenderer, ccui.Button.NORMAL_RENDERER_ZORDER, -1);
         this.addProtectedChild(this._buttonClickedRenderer, ccui.Button.PRESSED_RENDERER_ZORDER, -1);
         this.addProtectedChild(this._buttonDisableRenderer, ccui.Button.DISABLED_RENDERER_ZORDER, -1);
@@ -4888,9 +4887,6 @@ ccui.Button = ccui.Widget.extend({
                 normalRenderer.initWithFile(normal);
                 break;
             case ccui.Widget.PLIST_TEXTURE:
-                if (normal[0] === "#") {
-                    normal = normal.substr(1, normal.length - 1);
-                }
                 normalRenderer.initWithSpriteFrameName(normal);
                 break;
             default:
@@ -4927,9 +4923,6 @@ ccui.Button = ccui.Widget.extend({
                 clickedRenderer.initWithFile(selected);
                 break;
             case ccui.Widget.PLIST_TEXTURE:
-                if (selected[0] === "#") {
-                    selected = selected.substr(1, selected.length - 1);
-                }
                 clickedRenderer.initWithSpriteFrameName(selected);
                 break;
             default:
@@ -4961,9 +4954,6 @@ ccui.Button = ccui.Widget.extend({
                 disabledRenderer.initWithFile(disabled);
                 break;
             case ccui.Widget.PLIST_TEXTURE:
-                if (disabled[0] === "#") {
-                    disabled = disabled.substr(1, disabled.length - 1);
-                }
                 disabledRenderer.initWithSpriteFrameName(disabled);
                 break;
             default:
@@ -6748,18 +6738,6 @@ ccui.Slider = ccui.Widget.extend({
     },
     getZoomScale: function(){
         return this._zoomScale;
-    },
-    getSlidBallNormalRenderer : function () {
-        return this._slidBallNormalRenderer;
-    },
-    getSlidBallPressedRenderer : function () {
-        return this._slidBallPressedRenderer;
-    },
-    getSlidBallDisabledRenderer : function () {
-        return this._slidBallDisabledRenderer;
-    },
-    getSlidBallRenderer : function () {
-        return this._slidBallRenderer;
     },
     getDescription: function () {
         return "Slider";

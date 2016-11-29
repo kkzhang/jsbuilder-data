@@ -1382,13 +1382,8 @@ cc.ParticleSystem = cc.Node.extend({
                 locModeA.tangentialAccel = (pszTmp) ? parseFloat(pszTmp) : 0;
                 pszTmp = locValueForKey("tangentialAccelVariance", dictionary);
                 locModeA.tangentialAccelVar = (pszTmp) ? parseFloat(pszTmp) : 0;
-                var locRotationIsDir = locValueForKey("rotationIsDir", dictionary);
-                if (locRotationIsDir !== null) {
-                    locRotationIsDir = locRotationIsDir.toString().toLowerCase();
-                    locModeA.rotationIsDir = (locRotationIsDir === "true" || locRotationIsDir === "1");
-                }
-                else
-                    locModeA.rotationIsDir = false;
+                var locRotationIsDir = locValueForKey("rotationIsDir", dictionary).toLowerCase();
+                locModeA.rotationIsDir = (locRotationIsDir != null && (locRotationIsDir === "true" || locRotationIsDir === "1"));
             } else if (this.emitterMode === cc.ParticleSystem.MODE_RADIUS) {
                 var locModeB = this.modeB;
                 locModeB.startRadius = parseFloat(locValueForKey("maxRadius", dictionary));

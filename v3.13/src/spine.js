@@ -1831,7 +1831,7 @@ spine.SkeletonJson.prototype = {
                 slotData.a = this.toColor(color, 3);
             }
             slotData.attachmentName = slotMap["attachment"];
-            slotData.blendMode = spine.BlendMode[slotMap["blend"] || "normal"];
+            slotData.blendMode = spine.AttachmentType[slotMap["blend"] || "normal"];
             skeletonData.slots.push(slotData);
         }
         var skins = root["skins"];
